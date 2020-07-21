@@ -1,72 +1,32 @@
-def binary_search(arr, target, start=0, end=None):
-    # Handle empty lists
-    if len(arr) == 0:
-        return -1
-
+def binary_search(arr, target, start=0, end=None, direction="ascending"):
     # Default end if none is specified, for ease of use
     if end is None:
         end = len(arr)-1
     
-    # Base case: only one option left
-    if end - start == 0:
-        if arr[start] == target:
-            return start
-        else:
-            return -1
-    
-    # Check midpoint
-    mid = start + (end-start) // 2
-    # print("Searching for", target, "between points", start, mid, end)
-    # if end < start:
-    #     quit()
-    if target < arr[mid]:
-        # Search left half
-        if mid == start:
-            return binary_search(arr, target, start, mid)
-        else:
-            return binary_search(arr, target, start, mid-1)
-    elif target > arr[mid]:
-        # Search right half
-        if mid == end:
-            return binary_search(arr, target, mid, end)
-        else:
-            return binary_search(arr, target, mid+1, end)
-    else:  # if target == arr[mid]
-        return mid
+    if end >= start:
+        mid = start + (end-start) // 2
 
-""" logic reversed to handle lists sorted in descending order """
-def binary_search_descending(arr, target, start=0, end=None):
-    # Handle empty lists
-    if len(arr) == 0:
+        if target < arr[mid]:
+            if direction == "ascending":
+                # target must be in left half
+                return binary_search(arr, target, start, mid-1)
+            elif direction == "descending":
+                # target must be in right half
+                return binary_search(arr, target, mid+1, end, "descending")
+        elif target > arr[mid]:
+            if direction == "ascending":
+                # target must be in right half
+                return binary_search(arr, target, mid+1, end)
+            elif direction == "descending":
+                # target must be in left half
+                return binary_search(arr, target, start, mid-1, "descending")
+        else:
+            # target found (arr[mid] == target)
+            return mid
+    
+    # Start and end have converged without finding the target
+    else:
         return -1
-
-    # Default end if none is specified, for ease of use
-    if end is None:
-        end = len(arr)-1
-    
-    # Base case: only one option left
-    if end - start == 0:
-        if arr[start] == target:
-            return start
-        else:
-            return -1
-    
-    # Check midpoint
-    mid = start + (end-start) // 2
-    if target > arr[mid]:
-        # Search left half
-        if mid == start:
-            return binary_search_descending(arr, target, start, mid)
-        else:
-            return binary_search_descending(arr, target, start, mid-1)
-    elif target < arr[mid]:
-        # Search right half
-        if mid == end:
-            return binary_search_descending(arr, target, mid, end)
-        else:
-            return binary_search_descending(arr, target, mid+1, end)
-    else:  # if target == arr[mid]
-        return mid
 
 # STRETCH: implement an order-agnostic binary search
 # This version of binary search should correctly find 
@@ -83,9 +43,9 @@ def agnostic_binary_search(arr, target):
             return 0
         else:
             return -1
+    
+    # Compare first and last items to decide direction
     elif arr[0] < arr[-1]:
-        # arr is sorted ascending
-        return binary_search(arr, target)
-    else: 
-        # arr is sorted descending (or all one value)
-        return binary_search_descending(arr, target)
+        return binary_search(arr, target, direction="ascending")
+    else:
+        return binary_search(arr, target, direction="descending")
